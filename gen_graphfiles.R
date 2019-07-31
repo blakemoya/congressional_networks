@@ -3,9 +3,9 @@ library(jsonlite)
 
 # CONFIG
 congress = 116
-data_dir <-"C:/Users/Blake/Documents/R/Congress/congress/data/"
+data_dir <- paste(getwd(), "/congress/data/", sep = "")
 bill_dir <- paste(data_dir, congress, "/bills/", sep = "")
-key <- add_headers("X-API-Key" = "4HJLkrmQ1VotJ4cpC06Wf6yvRniFtyRDORusKSau")
+key <- add_headers("X-API-Key" = readLines("api_key.txt"))
 
 write_nodelist = function(){
   senate_members <- GET(paste("https://api.propublica.org/congress/v1/", congress, "/senate/members.json", sep=""), key)
@@ -58,3 +58,6 @@ write_edgelist = function(conn_mat){
   
   return(edge_list)
 }
+
+invisible(write_nodelist())
+write_edgelist(get_mat(bill_dir, write = FALSE))

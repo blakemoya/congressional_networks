@@ -15,22 +15,7 @@ desc_edge = function(edge){
       nodes$party[nodes$id == edge[2]] == "ID"){
     return("I")
   }
-  if (nodes$party[nodes$id == edge[1]] == nodes$party[nodes$id == edge[2]]){
-    if (nodes$party[nodes$id == edge[2]] == "R"){
-      return("R")
-    }
-    if (nodes$party[nodes$id == edge[2]] == "D"){
-      return("D")
-    }
-  }
-  if (nodes$party[nodes$id == edge[1]] != nodes$party[nodes$id == edge[2]]){
-    if (nodes$party[nodes$id == edge[2]] == "D"){
-      return("XD")
-    }
-    if (nodes$party[nodes$id == edge[2]] == "R"){
-      return("XR")
-    }
-  }
+  return(paste(nodes$party[nodes$id == edge[1]], nodes$party[nodes$id == edge[2]], sep = ""))
 }
 
 links$relation <- apply(links, 1, desc_edge)
@@ -38,23 +23,25 @@ net <- graph_from_data_frame(d = links, vertices = nodes, directed = TRUE)
 senate_net <- delete.vertices(net, nodes$id[nodes$short_title != "Sen." | !nodes$in_office])
 house_net <- delete.vertices(net, nodes$id[nodes$short_title == "Sen." | !nodes$in_office])
 
-png("senate_plot.png", height = 6.07, width = 7.14, units = "in", res = 300)
+png(paste(congress, "senate_plot.png", sep = ""), height = 6.07, width = 7.14, units = "in", res = 300)
 ggraph(senate_net, layout = "fr") +
-  geom_node_point(aes(color = V(senate_net)$party)) +
-  scale_color_manual(values = c("D" = "dodgerblue1", "R" = "firebrick1", "I" = "darkseagreen", "ID" = "darkseagreen")) +
   geom_edge_link(aes(color = E(senate_net)$relation), alpha = 0.1) +
-  scale_edge_color_manual(values = c("D" = "dodgerblue1", "R" = "firebrick1", "I" = "darkseagreen", "XD" = "dodgerblue4", "XR" = "firebrick4")) +
+  scale_edge_color_manual(name = "Direction", values = c("DD" = "dodgerblue1", "RR" = "firebrick1", "RD" = "dodgerblue4", "DR" = "firebrick4", "I" = "darkseagreen")) +
+  geom_node_point(aes(color = V(senate_net)$party)) +
+  scale_color_manual(name = "Party", values = c("D" = "dodgerblue1", "R" = "firebrick1", "I" = "darkseagreen", "ID" = "darkseagreen")) +
+  labs(x = "", y = "") +
   coord_fixed() +
   theme_bw()
 dev.off()
 
 
-png("house_plot.png", height = 6.07, width = 7.14, units = "in", res = 300)
+png(paste(congress, "house_plot.png", sep = ""), height = 6.07, width = 7.14, units = "in", res = 300)
 ggraph(house_net, layout = "fr") +
-  geom_node_point(aes(color = V(house_net)$party)) +
-  scale_color_manual(values = c("D" = "dodgerblue1", "R" = "firebrick1", "I" = "darkseagreen", "ID" = "darkseagreen")) +
   geom_edge_link(aes(color = E(house_net)$relation), alpha = 0.1) +
-  scale_edge_color_manual(values = c("D" = "dodgerblue1", "R" = "firebrick1", "I" = "darkseagreen", "XD" = "dodgerblue4", "XR" = "firebrick4")) +
+  scale_edge_color_manual(name = "Direction", values = c("DD" = "dodgerblue1", "RR" = "firebrick1", "RD" = "dodgerblue4", "DR" = "firebrick4", "I" = "darkseagreen")) +
+  geom_node_point(aes(color = V(house_net)$party)) +
+  scale_color_manual(name = "Party", values = c("D" = "dodgerblue1", "R" = "firebrick1", "I" = "darkseagreen", "ID" = "darkseagreen")) +
+  labs(x = "", y = "") +
   coord_fixed() +
   theme_bw()
 dev.off()
